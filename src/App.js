@@ -3,15 +3,20 @@ import { Component } from 'react';
 
 class App extends Component {
   state = {
-    names: [],
-    name: ''
+    fields: {
+      name: '',
+      email: ''
+    },
+    people: [],
   };
-  onNameChange = (e) => {
-    this.setState({ name: e.target.value });
+  onInputChange = (e) => {
+    const fields = this.state.fields;
+    fields[e.target.name] = e.target.value;
+    this.setState({ fields });
   }
   onFormSubmit = (e) => {
-    const names = [...this.state.names, this.state.name];
-    this.setState({ names: names, name: '' });
+    const people = [...this.state.people, this.state.fields];
+    this.setState({ people, fields: { name: '', email: '' } });
     e.preventDefault();
   }
   render() {
@@ -21,16 +26,23 @@ class App extends Component {
         <h1>Sign Up Sheet</h1>
         <form onSubmit={this.onFormSubmit}>
           <input
-            placeholder='Name...'
-            value={this.state.name}
-            onChange={this.onNameChange}
+            placeholder='Enter name'
+            name='name'
+            value={this.state.fields.name}
+            onChange={this.onInputChange}
+          />
+          <input
+            placeholder='Enter email address'
+            name='email'
+            value={this.state.fields.email}
+            onChange={this.onInputChange}
           />
           <input type='submit' />
         </form>
         <div>
           <h3>Names</h3>
           <ul>
-            {this.state.names.map((name, i) => <li key={i}>{name}</li>)}
+            {this.state.people.map(({ name, email }, i) => <li key={i}>{name} ({email})</li>)}
           </ul>
         </div>
       </div>
