@@ -2,7 +2,7 @@ import '../App.css';
 import PropTypes from 'prop-types';
 import { Component } from 'react';
 
-class App extends Component {
+class Field extends Component {
     static propTypes = {
         placeholder: PropTypes.string,
         name: PropTypes.string.isRequired,
@@ -40,4 +40,4 @@ class App extends Component {
     }
 }
 
-export default App;
+export default Field;

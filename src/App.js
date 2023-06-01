@@ -1,13 +1,16 @@
 import './App.css';
 import validator from 'validator';
 import { Component } from 'react';
-import Field from './components/Field'
+import Field from './components/Field';
+import CourseSelect from './components/CourseSelect';
 
 class App extends Component {
   state = {
     fields: {
       name: '',
-      email: ''
+      email: '',
+      course: '',
+      department: '',
     },
     fieldErrors: {},
     people: [],
@@ -29,6 +32,8 @@ class App extends Component {
 
     if (!person.name) return true;
     if (!person.email) return true;
+    if (!person.course) return true;
+    if (!person.department) return true;
     if (errMessages.length) return true;
 
     return false;
@@ -73,12 +78,18 @@ class App extends Component {
             validate={(val) => (validator.isEmail(val) ? false : 'Invalid Email')}
           />
           <br />
+          <CourseSelect
+            department={this.state.fields.department}
+            course={this.state.fields.course}
+            onChange={this.onInputChange}
+          />
+          <br />
           <input type='submit' disabled={this.validate()} />
         </form>
         <div>
           <h3>People</h3>
           <ul>
-            {this.state.people.map(({ name, email }, i) => <li key={i}>{name} ({email})</li>)}
+            {this.state.people.map(({ name, email, department, course }, i) => <li key={i}>{[name, email, department, course].join(' 🌟 ')}</li>)}
           </ul>
         </div>
       </div>
