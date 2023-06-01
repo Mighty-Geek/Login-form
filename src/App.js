@@ -1,4 +1,5 @@
 import './App.css';
+import validator from 'validator';
 import { Component } from 'react';
 
 class App extends Component {
@@ -7,6 +8,7 @@ class App extends Component {
       name: '',
       email: ''
     },
+    fieldErrors: {},
     people: [],
   };
   onInputChange = (e) => {
@@ -14,10 +16,29 @@ class App extends Component {
     fields[e.target.name] = e.target.value;
     this.setState({ fields });
   }
+  validate = (person) => {
+    const errors = {};
+    if (!person.name) errors.name = 'Name Required';
+    if (!person.email) errors.email = 'Email Required';
+    if (person.email && !validator.isEmail(person.email)) errors.email = 'Invalid Email';
+    return errors;
+  }
   onFormSubmit = (e) => {
-    const people = [...this.state.people, this.state.fields];
-    this.setState({ people, fields: { name: '', email: '' } });
+    const people = [...this.state.people];
+    const person = this.state.fields;
+    const fieldErrors = this.validate(person);
+    this.setState({ fieldErrors });
     e.preventDefault();
+
+    if (Object.keys(fieldErrors).length) return;
+
+    this.setState({
+      people: people.concat(person),
+      fields: {
+        name: '',
+        email: ''
+      }
+    })
   }
   render() {
 
@@ -31,16 +52,19 @@ class App extends Component {
             value={this.state.fields.name}
             onChange={this.onInputChange}
           />
+          <span style={{ color: 'red' }}>{this.state.fieldErrors.name}</span>
+          <br />
           <input
             placeholder='Enter email address'
             name='email'
             value={this.state.fields.email}
             onChange={this.onInputChange}
           />
+          <span style={{ color: 'red' }}>{this.state.fieldErrors.email}</span>
           <input type='submit' />
         </form>
         <div>
-          <h3>Names</h3>
+          <h3>People</h3>
           <ul>
             {this.state.people.map(({ name, email }, i) => <li key={i}>{name} ({email})</li>)}
           </ul>
