@@ -3,13 +3,15 @@ import { Component } from 'react';
 
 class App extends Component {
   state = {
-    names: []
+    names: [],
+    name: ''
   };
+  onNameChange = (e) => {
+    this.setState({ name: e.target.value });
+  }
   onFormSubmit = (e) => {
-    const name = this.refs.name.value;
-    const names = [...this.state.names, name];
-    this.setState({ names: names });
-    this.refs.name.value = '';
+    const names = [...this.state.names, this.state.name];
+    this.setState({ names: names, name: '' });
     e.preventDefault();
   }
   render() {
@@ -20,7 +22,8 @@ class App extends Component {
         <form onSubmit={this.onFormSubmit}>
           <input
             placeholder='Name...'
-            ref='name'
+            value={this.state.name}
+            onChange={this.onNameChange}
           />
           <input type='submit' />
         </form>
