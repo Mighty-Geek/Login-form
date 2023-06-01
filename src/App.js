@@ -1,25 +1,39 @@
-import logo from './logo.svg';
 import './App.css';
+import { Component } from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = {
+    names: []
+  };
+  onFormSubmit = (e) => {
+    const name = this.refs.name.value;
+    const names = [...this.state.names, name];
+    this.setState({ names: names });
+    this.refs.name.value = '';
+    e.preventDefault();
+  }
+  render() {
+
+    return (
+      <div className="App">
+        <h1>Sign Up Sheet</h1>
+        <form onSubmit={this.onFormSubmit}>
+          <input
+            placeholder='Name...'
+            ref='name'
+          />
+          <input type='submit' />
+        </form>
+        <div>
+          <h3>Names</h3>
+          <ul>
+            {this.state.names.map((name, i) => <li key={i}>{name}</li>)}
+          </ul>
+        </div>
+      </div>
+    );
+
+  }
 }
 
 export default App;
