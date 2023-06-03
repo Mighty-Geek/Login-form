@@ -14,6 +14,9 @@ class App extends Component {
     },
     fieldErrors: {},
     people: [],
+    // private to this component
+    _loading: false,
+    _saveStatus: 'READY', // 4 possible values: READY, SAVING, SUCCESS, ERROR
   };
   onInputChange = ({ name, value, error }) => {
     const fields = this.state.fields;
@@ -22,7 +25,7 @@ class App extends Component {
     fields[name] = value;
     fieldErrors[name] = error;
 
-    this.setState({ fields, fieldErrors });
+    this.setState({ fields, fieldErrors, _saveStatus: 'READY' });
   }
   validate = () => {
     const person = this.state.fields;
@@ -39,25 +42,44 @@ class App extends Component {
     return false;
   }
   onFormSubmit = (e) => {
-    const people = this.state.people;
     const person = this.state.fields;
-
     e.preventDefault();
 
     // prevent change for invalid input
     if (this.validate()) return;
 
+    const people = [...this.state.people, person];
+
     // add person to list people for valid input
-    this.setState({
-      people: people.concat(person),
-      fields: {
-        name: '',
-        email: '',
-      }
-    })
+    this.setState({ _saveStatus: 'SAVING' });
+    apiClient.savePeople(people)
+      .then(() => {
+        this.setState({
+          people: people,
+          fields: {
+            name: '',
+            email: '',
+            course: null,
+            department: null
+          },
+          _saveStatus: 'SUCCESS',
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        this.setState({ _saveStatus: 'ERROR' });
+      })
+  }
+  componentWillMount() {
+    this.setState({ _loading: true });
+    apiClient.loadPeople().then((people) => {
+      this.setState({ _loading: false, people: people });
+    });
   }
   render() {
-
+    if (this.state._loading) {
+      return <img alt='loading' src='../../loading.gif' />
+    }
     return (
       <div className="App">
         <h1>Sign Up Sheet</h1>
@@ -84,7 +106,12 @@ class App extends Component {
             onChange={this.onInputChange}
           />
           <br />
-          <input type='submit' disabled={this.validate()} />
+          {{
+            SAVING: <input value='Saving...' type='submit' disabled />,
+            SUCCESS: <input value='Saved!' type='submit' disabled />,
+            ERROR: <input value='Save Failed - Retry?' type='submit' disabled={this.validate()} />,
+            READY: <input value='Submit' type='submit' disabled={this.validate()} />,
+          }[this.state._saveStatus]}
         </form>
         <div>
           <h3>People</h3>
@@ -96,6 +123,29 @@ class App extends Component {
     );
 
   }
+}
+
+const apiClient = {
+  loadPeople: function () {
+    return {
+      then: function (cb) {
+        setTimeout(() => {
+          cb(JSON.parse(localStorage.people || '[]'));
+        }, 1000);
+      }
+    }
+  },
+  savePeople: function (people) {
+    const success = !!(this.count++ % 2);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (!success) return reject({ success });
+        localStorage.people = JSON.stringify(people);
+        return resolve({ success });
+      }, 1000);
+    });
+  },
+  count: 1
 }
 
 export default App;
