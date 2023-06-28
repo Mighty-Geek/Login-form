@@ -29,7 +29,7 @@ function mapDispatchToProps(dispatch) {
 const ReduxForm = connect(mapStateToProps, mapDispatchToProps)(Form);
 
 class App extends React.Component {
-  componentDidMount() {
+  componentWillMount() {
     store.dispatch(fetchPeople());
   }
   render() {
